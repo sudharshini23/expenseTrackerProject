@@ -24,37 +24,36 @@
         <button class="btn btn-dark" type="submit">Signup</button>
     </form>
 
+    <a href='../Login/login.html'> Existing User - Login</a>
     <ul id='listOfUsers'></ul>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 
     <script >
-        function userDetails(event) {
-            event.preventDefault();
-            const name = event.target.name.value; // this obj details is used in controllers post request
-            const number = event.target.number.value;
-            const password = event.target.password.value;
-            const obj = {
-                name,
-                number,
-                password
-            };
-            axios.post("http://localhost:3000/user/signup", obj)
-            .then((response) => {
-                displayData(response.data.users);
-            })
-            .catch((err) => {
+        async function userDetails(event) {
+            try {
+                event.preventDefault();
+                const name = event.target.name.value; // this obj details is used in controllers post request
+                const email = event.target.email.value;
+                const password = event.target.password.value;
+                const obj = {
+                    name,
+                    email,
+                    password
+                };
+                const response = await axios.post("http://localhost:3000/user/signup", obj)
+                if(response.status === 201) {
+                    // redirect user to login page - change on successful login
+                    window.location.href = '../Login/login.html'
+                }
+                else {
+                    throw new Error('Failed to Login');
+                }
+            }
+            catch(err) {
                 document.body.innerHTML = document.body.innerHTML + "<h4> Something went wrong </h4>"
                 console.log(err)
-            })
-        }
-
-        function displayData(obj) {
-            // console.log(obj);
-            const parentItems = document.getElementById('listOfUsers')
-            const childItems = document.createElement('li')
-            childItems.textContent = obj.name + ' - ' + obj.number + ' - ' + obj.password;
-            parentItems.appendChild(childItems)
+            }
         }
     </script>
 </body>
