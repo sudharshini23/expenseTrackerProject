@@ -1,13 +1,14 @@
 const User = require('../models/user');
+const bcrypt = require('bcrypt');
 
-// function isStringInvalid(string) {
-//     if(string == undefined || string.length === 0) {
-//         return true;
-//     }
-//     else {
-//         return false;
-//     }
-// }
+function isStringInvalid(string) {
+    if(string == undefined || string.length === 0) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 
 const postUserSignup = async (req,res,next) => {
     // if(!req.body.email) {
@@ -18,20 +19,25 @@ const postUserSignup = async (req,res,next) => {
         const email = req.body.email;
         const password = req.body.password;
 
-        if(name == undefined || name.length === 0 
-            || password == undefined || password.length === 0
-            || email == undefined || email.length === 0) 
+        if(isStringInvalid(name) || isStringInvalid(email || isStringInvalid(password)))
         {
             return res.status(400).json({ err : "Field should not be empty"})
         }
 
-        const newUser = await User.create({
-            name: name,
-            email: email,
-            password: password
+        const saltrounds = 10;
+        bcrypt.hash(password, saltrounds, async (err, hash) => {
+            console.log(err);
+            await User.create({ name, email, password: hash })
+            res.status(201).json({message: 'Successfully created new user'})
         })
+
+        // const newUser = await User.create({
+        //     name: name,
+        //     email: email,
+        //     password: password
+        // })
         
-        res.status(201).json({message: 'Successfully created new user'})
+        // res.status(201).json({message: 'Successfully created new user'})
     }
     
     catch(err) {
@@ -52,14 +58,20 @@ const postUserLogin = async(req,res,next) => {
 
         const response = await User.findAll({ where: { email }})
         if(response.length > 0) {
-            if(response[0].password === password) {
-                res.status(200).json({success: true, message: 'User login successful'})
-                console.log("User login successful")
-            }
-            else {
-                res.status(400).json({success: false, message: 'User not authorized'})
-                console.log("User not authorized")
-            }
+            bcrypt.compare(password, response[0].password, (err, result)  => {
+                if(err) {
+                    // res.status(500).json({success: false, message: 'Something went wrong'})
+                    throw new Error('Something went wrong');
+                }
+                if(result === true) {
+                    res.status(200).json({success: true, message: 'User login successful'})
+                    console.log("User login successful")
+                }
+                else {
+                    res.status(400).json({success: false, message: 'User not authorized'})
+                    console.log("User not authorized")
+                }
+            })
         }
         else {
             res.status(404).json({success: false, message: 'User not found'})
