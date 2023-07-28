@@ -36,6 +36,7 @@
             await axios.post("http://localhost:3000/user/login", objlogin)
             .then(response => {
                 alert(response.data.message);
+                window.location.href = '../Expense/expense.html'
             })
             .catch(err => {
                 console.log(JSON.stringify(err))

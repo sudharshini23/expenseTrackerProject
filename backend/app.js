@@ -14,10 +14,13 @@ const app = express();
 app.use(cors());
 
 const userSignup = require('./routes/user');   
+const expense = require('./routes/expense');
 
 app.use(bodyParser.json());
 
 app.use('/user', userSignup);
+
+app.use('/expense', expense);
 
 app.use(error.get404);
 
