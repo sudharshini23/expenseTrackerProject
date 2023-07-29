@@ -47,8 +47,8 @@ const postUserSignup = async (req,res,next) => {
         // res.status(201).redirect('/login/login.html')
 }
 
-function generateAccessToken(id, name) {
-    return jwt.sign({ userId: id, name: name} , process.env.JWT_token);
+const generateAccessToken = (id, name, ispremiumuser) => {
+    return jwt.sign({ userId: id, name: name, ispremiumuser} , process.env.JWT_token);
 }
 
 const postUserLogin = async(req,res,next) => {
@@ -69,7 +69,7 @@ const postUserLogin = async(req,res,next) => {
                     throw new Error('Something went wrong');
                 }
                 if(result === true) {
-                    res.status(200).json({success: true, message: 'User login successful', token: generateAccessToken(response[0].id, response[0].name)})
+                    res.status(200).json({success: true, message: 'User login successful', token: generateAccessToken(response[0].id, response[0].name, response[0].ispremiumuser)})
                     console.log("User login successful")
                 }
                 else {
@@ -105,5 +105,6 @@ const postUserLogin = async(req,res,next) => {
 
 module.exports = {
     postUserSignup,
-    postUserLogin
+    postUserLogin,
+    generateAccessToken
 }
