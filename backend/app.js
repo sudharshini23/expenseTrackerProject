@@ -18,8 +18,11 @@ app.use(cors());
 
 const userSignup = require('./routes/user');   
 const expense = require('./routes/expense');
+const purchaseRoute = require('./routes/purchase');
+
 const Expense = require('./models/expense');
 const User = require('./models/user');
+const Order = require('./models/orders');
 
 app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded()) // to handle forms
@@ -29,8 +32,13 @@ app.use('/user', userSignup);
 
 app.use('/expense', expense);
 
+app.use('/purchase', purchaseRoute);
+
 User.hasMany(Expense);
 Expense.belongsTo(User);
+
+User.hasMany(Order);
+Order.belongsTo(User);
 
 app.use(error.get404);
 

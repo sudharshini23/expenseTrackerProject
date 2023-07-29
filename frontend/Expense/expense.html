@@ -29,6 +29,9 @@
         <button class="btn btn-dark" type="submit">Add Expense</button>
     </form>
 
+    <button id="rzp-button1">Buy Premium</button>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <ul id="listOfExpenses"></ul>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
@@ -67,6 +70,34 @@
                 console.log(error)
             })
         })
+
+        document.getElementById('rzp-button1').onclick = async function (e) {
+            const token = localStorage.getItem('token');
+            const response = await axios.get("http://localhost:3000/purchase/premiummembership", { headers: {"Authorization" : token} })
+            console.log(response);
+            var options = 
+            {
+                "key": response.data.key_id, // Enter the key id generated from dashboard
+                "order_id": response.data.order.id, 
+                // For one time payment, this handler will handles successful payment
+                // amount cannot be passsed in frontend - frontend can be easily manipulated
+                "handler": async function (response) {
+                    await axios.post('http://localhost:3000/purchase/updatetransactionstatus', {
+                        order_id: options.order_id,
+                        payment_id: response.razorpay_payment_id,
+                    }, { headers: {"Authorization" : token} })
+                    alert('You are a Premium User now');
+                },
+            }
+            const rzpl = new Razorpay(options);
+            rzpl.open();
+            e.preventDefault();
+
+            rzpl.on('payment.failed', function(response) {
+                window.location.href = './expense.html'
+                console.log(response);
+            })
+        }
 
         function displayExpenses(obj) {
             // console.log(obj);
