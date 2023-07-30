@@ -5,19 +5,26 @@ const e = require('express');
 
 const getUserLeaderBoard = async (req,res,next) => {
     try {
+
         const leaderboardofusers = await User.findAll({
-            attributes: ['id', 'name', [sequelize.fn('sum', sequelize.col('expenses.expenseamount')), 'total_cost'] ],
-            include: [
-                // can be join of more than 2 tables so array
-                {
-                    model: Expense,
-                    attributes: []
-                }
-            ],
-            group: ['id'],
-            order: [['total_cost', 'DESC']]
+            order: [['totalExpenses', 'DESC']]
+        })
+        // --- USING LEFT OUTER JOIN -----------------------------------
+        // const leaderboardofusers = await User.findAll({
+        //     attributes: ['id', 'name', [sequelize.fn('sum', sequelize.col('expenses.expenseamount')), 'total_cost'] ],
+        //     include: [
+        //         // can be join of more than 2 tables so array
+        //         {
+        //             model: Expense,
+        //             attributes: []
+        //         }
+        //     ],
+        //     group: ['id'],
+        //     order: [['total_cost', 'DESC']]
             
-        });
+        // });
+        // ----------------------------------------------------------------
+        // ---- USING JOINS ----------
         // console.log(users.id)
         // console.log(users.name)
 
