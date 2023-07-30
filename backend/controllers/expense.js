@@ -16,13 +16,15 @@ const getexpense = async (req,res,next) => {
 } 
 
 const addexpense = async (req,res,next) => {
-    console.log(req.body);
+    // console.log(req.body);
     const t = await sequelize.transaction();
 
 try {
+    console.log(req.body);
     const expenseamount = req.body.expenseamount;
     const description = req.body.description;
     const category = req.body.category;
+    console.log(req.user.id);
     const expense = await Expense.create({
         expenseamount: expenseamount,
         description: description,
@@ -41,7 +43,7 @@ try {
         transaction: t
     })
     await t.commit();
-    res.status(201).json({expenses: result})
+    res.status(201).json({expenses: expense})
 }
     catch(err) {
         await t.rollback();
