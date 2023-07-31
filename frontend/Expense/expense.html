@@ -31,6 +31,8 @@
 
     <div id="message"></div>
 
+    <button id="logout">Logout</button>
+
     <button id="rzp-button1">Buy Premium</button>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
@@ -178,6 +180,12 @@
             childNode.appendChild(delBtn);
             parentNode.appendChild(childNode);
         }
+
+        document.getElementById('logout').onclick() = function(event) {
+            event.preventDefault();
+            window.location.href = '../Login/login.html'
+        }
+
     </script>
 </body>
 </html>

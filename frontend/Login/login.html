@@ -18,6 +18,7 @@
             <input type="password" id="password" class="form-control" required>
         </div>
         <button class="btn btn-dark" type="submit">Login</button>
+        <button class="btn btn-dark" type="submit" id="forgot">Forgot Password</button>
     </form>
 
     <a href='../Signup/signup.html'> New User - Signup </a>
@@ -44,6 +45,13 @@
                 console.log(JSON.stringify(err))
                 document.body.innerHTML = document.body.innerHTML + `<div>${err.message}<div>`
             })
+        }
+
+            document.getElementById('forgot').onclick = function(event) {
+                event.preventDefault();
+                window.location.href = '../Password/password.html';
+            }
+
             // try {
             //     event.preventDefault();
             //     const email = event.target.email.value;
@@ -72,7 +80,7 @@
             //     document.body.innerHTML = document.body.innerHTML + `${err.message}`
             //     console.log(JSON.stringify(err))
             // }
-        }
+        // }
     </script>
 </body>
 </html>

@@ -20,10 +20,12 @@ const userSignup = require('./routes/user');
 const expense = require('./routes/expense');
 const purchaseRoute = require('./routes/purchase');
 const premiumFeatureRoutes = require('./routes/premiumFeature');
+const passwordRoute = require('./routes/password');
 
 const Expense = require('./models/expense');
 const User = require('./models/user');
 const Order = require('./models/orders');
+const forgotPassword = require('./models/password');
 
 app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded()) // to handle forms
@@ -37,15 +39,20 @@ app.use('/purchase', purchaseRoute);
 
 app.use('/premium', premiumFeatureRoutes);
 
+app.use('/password', passwordRoute);
+
 User.hasMany(Expense);
 Expense.belongsTo(User);
 
 User.hasMany(Order);
 Order.belongsTo(User);
 
+User.hasMany(forgotPassword);
+forgotPassword.belongsTo(User);
+
 app.use(error.get404);
 
-sequelize.sync()
+sequelize.sync({force: true})
 .then(result => {
     app.listen(3000);
 })
