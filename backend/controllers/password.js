@@ -19,7 +19,7 @@ const forgotpassword = async(req,res,next) => {
             const id = uuid.v4();
             console.log(id);
             const forgotpasswordcreate = await forgotpasswordmodel
-            .create({ id, active: true, userId: user.id })
+            .create({ id, active: true, userId: user[0].id })
             const tranEmailApi = new Sib.TransactionalEmailsApi()
             const sender = {
                 // email: 'tarunbhadoriya141@gmail.com'

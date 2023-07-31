@@ -52,7 +52,7 @@ forgotPassword.belongsTo(User);
 
 app.use(error.get404);
 
-sequelize.sync({force: true})
+sequelize.sync()
 .then(result => {
     app.listen(3000);
 })
