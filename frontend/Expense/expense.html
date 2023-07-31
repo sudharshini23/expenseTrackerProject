@@ -27,8 +27,8 @@
             </select>
         </div>
         <button class="btn btn-dark" type="submit">Add Expense</button>
-        <button onclick="download()" class="btn btn-dark" id="downloadexpense">Download File</button>
     </form>
+    <button onclick="download()" class="btn btn-dark" id="downloadexpense">Download File</button>
     <div id="message"></div>
 
     <button id="logout">Logout</button>
@@ -41,11 +41,36 @@
 
     <ul id="leaders"></ul>
 
+    <div>
+        <table class="paginationexpenses">
+            <h1>Expenses to Display</h1>
+            <label for="expensesPreference">Select the number of expenses to display:</label>
+            <select id="expensesPreference">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+            </select>
+            <ul class="itemspagination" id="items"></ul>
+            <div id="pagination"></div>
+        </table>
+    </div>
 
+    <div>
+        <table class="paginationexpenses">
+            <ul class="itemspagination" id="items2">
+            
+            </ul>
+        </table>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 
     <script>
+        const expensesPreferenceDropdown = document.getElementById('expensesPreference');
         function expenseDetails(event) {
             event.preventDefault();
             const expenseamount = event.target.expenseamount.value;
@@ -78,12 +103,12 @@
             console.log(token);
             try {
                 const response = await axios.get("http://localhost:3000/user/download", { headers: {"Authorization" : token} })
-                console.log(response.data);
+                console.log(response);
             //     console.log(response.data.urls);
             //     showUrls(response.data.urls);
                 if(response.status === 200) {
                     var a = document.createElement("a");
-                    a.href = response.data.fileUrl;
+                    a.href = response.data.fileURl;
                     a.download = 'myexpense.csv';
                     a.click();
                 }
@@ -92,7 +117,7 @@
                 }
             }
             catch(err) {
-                document.body.innerHTML = document.body.innerHTML + `<div>${err.message}<div>`
+                // document.body.innerHTML = document.body.innerHTML + `<div>${err.message}<div>`
                 console.log(err)
             }
         }
@@ -106,7 +131,90 @@
             return JSON.parse(jsonPayload);
         }
 
+        function saveExpensePreference(expensepref) {
+            localStorage.setItem('expensesPreference', expensepref);
+            showExpense();
+        }
+
+        expensesPreferenceDropdown.addEventListener('change', function() {
+            const selectedValue = expensesPreferenceDropdown.value;
+            saveExpensePreference(selectedValue);
+        })
+
+        function showExpense(page) {
+            document.getElementById('items').innerHTML = "";
+            const token = localStorage.getItem('token');
+            console.log(token);
+
+            const expensepref = localStorage.getItem('expensesPreference');
+
+            const pagesize = expensepref ? parseInt(expensepref) : 5;
+            if(!page || page < 1) {
+                page = 1;
+            }
+
+            axios.get(`http://localhost:3000/expense/getpageexpenses?page=${page}&pagesize=${pagesize}`, { headers: {"Authorization" : token} })
+            .then((response) => {
+                console.log(response.data.allExpenses);
+                const{currentPage, hasNextPage, nextPage, hasPreviousPage, previousPage, lastPage} = response.data;
+                response.data.allExpenses.forEach((expData) => {
+                    document.getElementById('items').innerHTML += `
+                                                                    ${expData.expenseamount} - ${expData.description} - ${expData.category}
+                                                                    <input type="button" value="Delete Expense" onclick="document.getElementById('listOfExpenses')">`
+                })
+                showPagination({currentPage, hasNextPage, nextPage, hasPreviousPage, previousPage, lastPage})
+                const token = localStorage.getItem('token');
+                const decodeToken = parseJwt(token);
+                const ispremiumuser = decodeToken.ispremiumuser
+                if(ispremiumuser) {
+                    showLeaderboard();
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+
+        function showPagination({
+            currentPage,
+            hasNextPage,
+            nextPage,
+            hasPreviousPage,
+            previousPage,
+        })
+        {
+            const button = document.getElementById('pagination');
+            let buttonsHTML = []; // array fr pagination buttons
+
+            if (hasPreviousPage) {
+                console.log("hasPreviousPage")
+                buttonsHTML.push(`<button class="btn btn-primary" onclick="showExpense(${previousPage})">Previous Page</button>`);
+            }
+
+            if (hasNextPage) {
+                console.log("hasNextPage")
+                buttonsHTML.push(`<button class="btn btn-primary" onclick="showExpense(${nextPage})">Next Page</button>`);
+            }
+
+            button.innerHTML = buttonsHTML.join(' ');
+        }
+
+        // function getExpense(page) {
+        //     let rows = localStorage.getItem('rows');
+        //     const token = localStorage.getItem('token');
+        //     console.log(page);
+                // axios.get(`http://localhost:3000/expense/get-expense/page=${page}/rows=${rows}`,{headers:{"Authorization":token}})
+                // .then((response)=>{
+                //     console.log("page2",response.data);
+                //     showuser(response.data.allExpense);
+                //     showPagination(response.data);
+                // })
+                // .catch((err)=>{console.log(err)})
+
+        // }
+
         window.addEventListener("DOMContentLoaded", () => {
+            // const page = 1;
             const token = localStorage.getItem('token');
             const decodeToken = parseJwt(token);
             console.log(decodeToken);
@@ -207,7 +315,7 @@
             parentNode.appendChild(childNode);
         }
 
-        // document.getElementById('logout').onclick() = function(event) {
+        // document.getElementById('logout').onclick = function(event) {
         //     event.preventDefault();
         //     window.location.href = '../Login/login.html'
         // }

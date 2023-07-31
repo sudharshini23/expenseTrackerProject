@@ -14,4 +14,8 @@ router.get('/getexpense', userauthentication.authenticate , expenseController.ge
 
 router.delete('/deleteexpense/:id', userauthentication.authenticate, expenseController.deleteexpense);
 
+router.get('/getpageexpenses', userauthentication.authenticate ,expenseController.getexpenses);
+
+// router.get('/download', authenticationmiddleware.authenticate, expenseController.downloadexpense);
+
 module.exports = router;
