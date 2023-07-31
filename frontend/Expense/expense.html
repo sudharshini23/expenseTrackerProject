@@ -158,10 +158,34 @@
                 console.log(response.data.allExpenses);
                 const{currentPage, hasNextPage, nextPage, hasPreviousPage, previousPage, lastPage} = response.data;
                 response.data.allExpenses.forEach((expData) => {
-                    document.getElementById('items').innerHTML += `
-                                                                    ${expData.expenseamount} - ${expData.description} - ${expData.category}
-                                                                    <input type="button" value="Delete Expense" onclick="document.getElementById('listOfExpenses')">`
-                })
+                    // document.getElementById('items').innerHTML += `${displayExpenses(expData)}`
+                    // <input type="button" value="Delete Expense" onclick="">
+                    // document.getElementById('items').innerHTML += `
+                    //                                                 ${expData.expenseamount} - ${expData.description} - ${expData.category}
+                    //                                                 `
+                    const expenseItem = document.createElement('div');
+                    expenseItem.innerHTML = `${expData.expenseamount} - ${expData.description} - ${expData.category}`;
+
+                    const delBtn = document.createElement('input');
+                    delBtn.type = 'button';
+                    delBtn.value = 'Delete Expense';
+
+                    delBtn.onclick = () => {
+                    const token = localStorage.getItem('token');
+                    axios.delete(`http://localhost:3000/expense/deleteexpense/${expData.id}`, { headers: {"Authorization" : token} })
+                    .then((deleteResponse) => {
+                        console.log("successful deletion is done")
+                        expenseItem.remove();
+                    })
+                    .catch((deleteError) => {
+                        console.error("Error deleting expense:", deleteError);
+                    });
+            };
+
+            expenseItem.appendChild(delBtn);
+            document.getElementById('items').appendChild(expenseItem);
+        });
+
                 showPagination({currentPage, hasNextPage, nextPage, hasPreviousPage, previousPage, lastPage})
                 const token = localStorage.getItem('token');
                 const decodeToken = parseJwt(token);
