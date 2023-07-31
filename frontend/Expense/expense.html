@@ -27,8 +27,8 @@
             </select>
         </div>
         <button class="btn btn-dark" type="submit">Add Expense</button>
+        <button onclick="download()" class="btn btn-dark" id="downloadexpense">Download File</button>
     </form>
-
     <div id="message"></div>
 
     <button id="logout">Logout</button>
@@ -40,6 +40,8 @@
     <ul id="listOfBoard"></ul>
 
     <ul id="leaders"></ul>
+
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 
@@ -69,6 +71,30 @@
         function showPremiumuserMessage() {
             document.getElementById('rzp-button1').style.visibility = 'hidden';
             document.getElementById('message').innerHTML = "You are a Premium User";
+        }
+
+        async function download() {
+            const token = localStorage.getItem('token');
+            console.log(token);
+            try {
+                const response = await axios.get("http://localhost:3000/user/download", { headers: {"Authorization" : token} })
+                console.log(response.data);
+            //     console.log(response.data.urls);
+            //     showUrls(response.data.urls);
+                if(response.status === 200) {
+                    var a = document.createElement("a");
+                    a.href = response.data.fileUrl;
+                    a.download = 'myexpense.csv';
+                    a.click();
+                }
+                else {
+                    throw new Error(response.data.message)
+                }
+            }
+            catch(err) {
+                document.body.innerHTML = document.body.innerHTML + `<div>${err.message}<div>`
+                console.log(err)
+            }
         }
 
         function parseJwt (token) {
@@ -181,10 +207,10 @@
             parentNode.appendChild(childNode);
         }
 
-        document.getElementById('logout').onclick() = function(event) {
-            event.preventDefault();
-            window.location.href = '../Login/login.html'
-        }
+        // document.getElementById('logout').onclick() = function(event) {
+        //     event.preventDefault();
+        //     window.location.href = '../Login/login.html'
+        // }
 
     </script>
 </body>
